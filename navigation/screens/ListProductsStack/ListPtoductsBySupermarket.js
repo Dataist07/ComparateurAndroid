@@ -54,7 +54,7 @@ import {
     
         const renderItem = ({ item }) => {
           const isChecked = checkedItems[item.id];
-          const backgroundColor = isChecked ? "#eee" : "#fff";
+          const backgroundColor = isChecked ? "#fcedb6" : "#fff";
           return (
             <View style={[styles.item, { backgroundColor }]}>
               <View style={styles.columnLeft}>
@@ -70,17 +70,24 @@ import {
               
               <View style={styles.details}>
                 <Text style={styles.name}>{item.nom_produit}</Text>
-                <Text style={styles.price}>{item.prix_produit} €</Text>
-                <Text style={styles.priceUnit} >{item.prix_ratio}€{item.unite} </Text>
-                
-                <View style={styles.quantityContainer}>
-                  <Pressable onPress={() => decreaseQuantity(item)}>
-                    <Text style={styles.quantityButton}>-</Text>
+                <View style={styles.columnInter}>
+
+                  <View style={styles.columnInterLeft}>
+                    <Text style={styles.price}>{item.prix_produit} €</Text>
+                    <Text style={styles.priceUnit} >{item.prix_ratio}€{item.unite} </Text>
+                  </View>
+                  
+                  <View style={styles.columnInterRight}>
+                    <Pressable onPress={() => decreaseQuantity(item)}>
+                      <Text style={styles.quantityButton}>-</Text>
+                    </Pressable>
+                    <Text style={styles.quantity}>{item.quantity}</Text>
+                    <Pressable onPress={() => increaseQuantity(item)}>
+                      <Text style={styles.quantityButton}>+</Text>
                   </Pressable>
-                  <Text style={styles.quantity}>{item.quantity}</Text>
-                  <Pressable onPress={() => increaseQuantity(item)}>
-                    <Text style={styles.quantityButton}>+</Text>
-                  </Pressable>
+
+                  
+                  </View>
                 </View>
               </View>
               
@@ -156,6 +163,19 @@ import {
       backgroundColor: "#fff",
       padding: 10,
     },
+    columnInter:{
+      flexDirection: "row",
+      marginTop:10
+    },
+    columnInterLeft:{
+      alignItems: "flex-start",
+      
+    },
+    columnInterRight:{
+      marginLeft: 5,
+      flexDirection: "row",
+      alignItems: "center",
+    },
     item: {
       flexDirection: "row",
       alignItems: "center",
@@ -170,49 +190,46 @@ import {
     },
     image: {
       alignItems: "center",
-      width: 75,
-      height: 75,
-      borderRadius: 5,
-      marginRight: 10,
-      marginLeft: 10,
+      width: 100,
+      height: 100,
+      borderRadius: 7,
+      marginRight: 5,
+      marginLeft: 5,
     },
     details: {
       flex: 1,
       
     },
     name: {
-      fontSize: 16,
+      fontSize: 18,
       fontWeight: "bold",
       marginBottom: 5,
     },
     price: {
-      fontSize: 16,
+      fontSize: 20,
       fontWeight: "bold",
-      color: "#888",
       marginBottom: 10,
     },
     priceUnit :{
-      fontSize: 16,
+      fontSize: 18,
       fontWeight: "bold",
       color: "#941919",
       marginBottom: 10,
     },
-    quantityContainer: {
-      flexDirection: "row",
-      alignItems: "center",
-    },
+
     quantityButton: {
-      backgroundColor: "#eee",
+      backgroundColor: "#FCC908",
       padding: 5,
       borderRadius: 5,
-      fontSize: 18,
+      fontSize: 20,
       marginRight: 10,
-      width: 30,
-      height: 30,
+      width: 32,
+      height: 32,
       textAlign: "center",
+      fontWeight: "bold",
     },
     quantity: {
-      fontSize: 18,
+      fontSize: 20,
       fontWeight: "bold",
       marginHorizontal: 10,
     },
@@ -242,17 +259,10 @@ import {
       fontWeight: "bold",
       color: "#000",
     },
-  
-    checkoutText: {
-      fontSize: 18,
-      fontWeight: "bold",
-      color: "#fff",
-      textAlign: "center",
-    },
     rayon_principalName :{
       marginVertical: 25,
       textDecorationLine: 'underline',
-      fontSize: 18,
+      fontSize: 24,
       fontWeight: "bold",
       color: "black",
       textAlign: "center",
@@ -282,7 +292,6 @@ import {
       height : 27,
       width: 27,
       marginBottom: 7,
-     
       
     },
   });

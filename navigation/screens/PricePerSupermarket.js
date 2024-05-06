@@ -14,51 +14,15 @@ import {
   ActivityIndicator
 } from "react-native";
 import { BannerAd, BannerAdSize, TestIds, InterstitialAd, AdEventType, RewardedInterstitialAd, RewardedAdEventType } from 'react-native-google-mobile-ads';
-import { addToCart, decrementQuantity, incrementQuantity, removeFromCart,deleteCart } from "../../store/CartSlice";
+import { deleteCart } from "../../store/CartSlice";
 
 const adUnitId = __DEV__ ? TestIds.BANNER : 'ca-app-pub-3515253820147436/1291787987';
 
 const adInterId = __DEV__ ? TestIds.INTERSTITIAL : 'ca-app-pub-3515253820147436/8971625937';
 
-const interstitial = InterstitialAd.createForAdRequest(adInterId , {
-  requestNonPersonalizedAdsOnly: true
-});
+
 
 const PricePerSupermarket = () => {
-
-  const [interstitialLoaded, setInterstitialLoaded] = useState(false);
-
-  const loadInterstitial = () => {
-    const unsubscribeLoaded = interstitial.addAdEventListener(
-      AdEventType.LOADED,
-      () => {
-        setInterstitialLoaded(true);
-      }
-    );
-
-    const unsubscribeClosed = interstitial.addAdEventListener(
-      AdEventType.CLOSED,
-      () => {
-        setInterstitialLoaded(false);
-        interstitial.load();
-      }
-    );
-
-    interstitial.load();
-
-    return () => {
-      unsubscribeClosed();
-      unsubscribeLoaded();
-    }
-  }
-
-  useEffect(() => {
-    const unsubscribeInterstitialEvents = loadInterstitial();
-
-    return () => {
-      unsubscribeInterstitialEvents();
-    };
-  }, [])
 
 
   const supermarketImages = {
@@ -117,14 +81,14 @@ const PricePerSupermarket = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      {interstitialLoaded ? 
+     
         <FlatList
           data={cartData}
           keyExtractor={(item) => item.supermarket}
           renderItem={({ item }) => (  
             <Pressable
               onPress={() =>{
-                interstitial.show();
+        
                 navigation.navigate("Liste de course", {
                   supermarket: item.supermarket,
                   totalPrice: item.totalPrice,
@@ -159,13 +123,7 @@ const PricePerSupermarket = () => {
             </Pressable>
           )}
         />
-        : (
-          <View style={styles.text}>
-            <ActivityIndicator/>
-            <Text>Chargement</Text>
-          </View>
-        ) 
-      }
+ 
 
       <BannerAd 
         unitId={adUnitId}
@@ -197,23 +155,33 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   supermarket: {
-    fontSize: 16,
+    fontSize: 24,
     fontWeight: "bold",
   },
   totalPrice: {
     marginTop: 5,
-    fontSize: 14,
+    fontSize: 18,
     fontWeight: "bold",
   },
   deleteButton: {
-    backgroundColor: "#fff",
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 5,
-    borderWidth: 1,
+    backgroundColor:'#FCC908',
+    borderRadius:7,
+    marginHorizontal:5,
+    paddingHorizontal:10,
+    paddingVertical:5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 45,
+    width:100,
+  },
+  deleteButtonText:{
+    fontSize: 16,
+    textAlign: 'center',
+    color: "#1E262F",
+    fontWeight: '700',
   },
   meanPricePerQuantity: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: "bold",
     color: "#777",
   },

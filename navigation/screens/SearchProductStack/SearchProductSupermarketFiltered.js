@@ -1,6 +1,6 @@
 
 import React, { useEffect,useState } from "react";
-
+import { useNavigation } from "@react-navigation/native";
 import {
   FlatList,
   TextInput,
@@ -16,13 +16,18 @@ import {
 } from "react-native";
 import { MemoizedItem } from "./MemoizedItem";
 import {Picker} from '@react-native-picker/picker';
+import { BannerAd, BannerAdSize, TestIds, InterstitialAd, AdEventType, RewardedInterstitialAd, RewardedAdEventType } from 'react-native-google-mobile-ads';
 
-const SearchProductSupermarketFiltered = ({ data }) => {
+const adUnitId = __DEV__ ? TestIds.BANNER : 'ca-app-pub-3515253820147436/7984640105';
+const SearchProductSupermarketFiltered = ({ route }) => {
+  const navigation = useNavigation();
+  const { data,selectedDrives,listRayonsFilter } = route.params;
+  const listRayonsFilter2 = listRayonsFilter !== undefined ? listRayonsFilter : Array(17).fill(true);
+  
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [confirmSelection, setConfirmSelection] = useState(false);
   const [filteredData, setFilteredData] = useState([]);
-  const [sortOption, setSortOption] = useState({ sortBy: "prix_produit", sortOrder: "asc" });
 
   const allItems = data.flatMap((items) => items);
 
@@ -45,11 +50,81 @@ const SearchProductSupermarketFiltered = ({ data }) => {
 
       setFilteredData(filteredData);
       setLoading(false);
+
     }, 1); // 1/1000 seconds
+   
   };
 
+
+  const [filteredRayonData, setFilteredRayonData] = useState([]);
+
+  const [listRayonsProduct, setListRayonsProduct] = useState(Array(17).fill(false));
+
+
+  const rayonIndexMap = {
+    "Fruits, légumes": 1,
+    "Viandes, poissons": 2,
+    "Charcuterie, traiteur": 3,
+    "Pain, pâtisserie": 4,
+    "Produits laitiers, oeufs, fromages": 5,
+    "Bio": 6,
+    "Surgelés": 7,
+    "Épicerie sucrée": 8,
+    "Épicerie salée": 9,
+    "Boissons": 10,
+    "Produits du monde": 11,
+    "Nutrition, végétale": 12,
+    "Bébé": 13,
+    "Hygiène, beauté": 14,
+    "Entretien, nettoyage": 15,
+    "Animal": 16
+  };
+
+  // rayon of filtered data
+  const handleRayonPresent = () => {
+    const rayonsPrincipaux = [...new Set(filteredData.map(item => item.rayon_principal))];
+    const newListRayonsProduct = Array(17).fill(false); // Create a copy of the current array
+    rayonsPrincipaux.forEach(rayon => {
+      const index = rayonIndexMap[rayon];
+      if (index !== undefined) {
+        newListRayonsProduct[index] = true;
+      }
+    });
+    setListRayonsProduct(newListRayonsProduct); // Update the state with the new array
+  };
+
+  useEffect(() => {
+    handleRayonPresent();
+  }, [filteredData]); 
+
+  // filter rayon
+  const handleFilterRayon = () => {
+    if (listRayonsFilter !== undefined){
+      const trueIndices = listRayonsFilter2.map((value, index) => value ? index : -1).filter(index => index !== -1);
+      // Map trueIndices to rayons using rayonIndexMap
+      const rayonsFiltered = trueIndices.map(index => {
+      return Object.keys(rayonIndexMap).find(key => rayonIndexMap[key] === index);
+      });
+
+      console.log(rayonsFiltered); // Output the filtered rayons
+
+      const newFilteredRayonData = filteredData.filter(item => rayonsFiltered.includes(item.rayon_principal));
+      setFilteredRayonData(newFilteredRayonData);
+    } else {
+      setFilteredRayonData(filteredData);
+    }
+  };
+
+  useEffect(() => {
+
+    handleFilterRayon();
+  }, [listRayonsFilter2,filteredData]); 
+
+
+  const [sortOption, setSortOption] = useState({ sortBy: "prix_produit", sortOrder: "asc" });
+  
   // Sort the data based on sortOption
-  const sortedData = [...filteredData].sort((a, b) => {
+  const sortedData = [...filteredRayonData].sort((a, b) => {
     if (sortOption.sortBy === "prix_produit") {
       return sortOption.sortOrder === "asc" ? a.prix_produit - b.prix_produit : b.prix_produit - a.prix_produit;
     } else if (sortOption.sortBy === "prix_ratio") {
@@ -64,11 +139,21 @@ const SearchProductSupermarketFiltered = ({ data }) => {
     { label: "Prix à l'unité croissant", value: { sortBy: "prix_ratio", sortOrder: "asc" } },
     { label: "Prix à l'unité décroissant", value: { sortBy: "prix_ratio", sortOrder: "desc" } },
   ];
-
-
+  
   return (
-    <SafeAreaView>
-      <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.container2}>
+          <Text style={styles.infoTextDrive}>Drives Choisis: </Text>
+        
+        {selectedDrives.map(({ nom_drive }, index) => (
+          <Text style={styles.infoTextDrive} key={index}>
+            - {nom_drive}
+          </Text>
+        ))}
+        </View>
+
+      <SafeAreaView style={styles.container3}>
+        
         <View style={styles.searchContainer}>
           <TextInput
             style={styles.searchInput}
@@ -76,31 +161,43 @@ const SearchProductSupermarketFiltered = ({ data }) => {
             value={searchQuery}
             placeholder="Nom produit"
           />
-          <Button title={"Entrer"} onPress={handleSearchQuery} style={styles.searchButton} />
+
+              <TouchableOpacity 
+                onPress={handleSearchQuery} style={styles.buttonEntrer} >
+                <Text style={styles.infoText} >Entrer</Text>
+              </TouchableOpacity>
+          
         </View>
-        {confirmSelection === false ? (
-          <View style={styles.indicator}>
-            <Text>Cherchez vos produit</Text>
-          </View>
-        ) : loading ? (
-          // Render ActivityIndicator while loading is true
-          <View style={styles.indicator}>
-            <ActivityIndicator />
-            <Text>Chargement</Text>
-          </View>
-        ) : sortedData.length > 0 ? (
-          <>
-            <View style={styles.sortContainer}>
+
+        <View style={styles.sortContainer}>
               <Picker
                 selectedValue={JSON.stringify(sortOption)} // Convert object to string for comparison
                 style={styles.sortButton}
                 onValueChange={(itemValue) => setSortOption(JSON.parse(itemValue))} // Convert string back to object
               >
                 {sortOptions.map((option, index) => (
-                  <Picker.Item key={index} label={option.label} value={JSON.stringify(option.value)} /> // Convert object to string for comparison
+                  <Picker.Item style={styles.infoText} key={index} label={option.label} value={JSON.stringify(option.value)} /> // Convert object to string for comparison
                 ))}
               </Picker>
+              
+              <TouchableOpacity 
+                onPress={() => navigation.navigate("Filter",{ data,selectedDrives,listRayonsProduct,listRayonsFilter2 } )} style={styles.buttonFiltre} >
+                <Text style={styles.infoText} >Filtre</Text>
+              </TouchableOpacity>
             </View>
+        {confirmSelection === false ? (
+          <View style={styles.indicator}>
+            <Text style={styles.infoText}>Cherchez vos produit</Text>
+          </View>
+        ) : loading ? (
+          // Render ActivityIndicator while loading is true
+          <View style={styles.indicator}>
+            <ActivityIndicator />
+            <Text style={styles.infoText}>Chargement</Text>
+          </View>
+        ) : sortedData.length > 0 ? (
+          <>
+
             <FlatList
               data={sortedData}
               keyExtractor={(item) => item.id.toString()}
@@ -110,18 +207,35 @@ const SearchProductSupermarketFiltered = ({ data }) => {
           </>
         ) : (
           <View style={styles.indicator}>
-            <Text>Produit pas trouvé </Text>
+            <Text style={styles.infoText}>Produit pas trouvé </Text>
           </View>
         )}
+         <BannerAd style={styles.ad}
+          unitId={adUnitId}
+          size={BannerAdSize.FULL_BANNER}
+          requestOptions={{
+              requestNonPersonalizedAdsOnly: true
+          }}
+        />
       </SafeAreaView>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+
   container: {
-    height: '100%',
-    marginVertical: 5,
+    height:'100%',
+    backgroundColor: "#fff",
+  },
+  container2: {
+    flexDirection: 'column',
+    marginTop:10,
+    justifyContent: 'flex-start',
+    backgroundColor: "#fff",
+  },
+  container3: {
+    height:'87%',
     backgroundColor: "#fff",
   },
   searchContainer: {
@@ -134,16 +248,31 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     flex:1,
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "bold",
     color: "#333",
+    fontWeight: '700',
   },
-  searchButton:{
-    backgroundColor:'#007AFF',
-    borderRadius:5,
-    marginLeft:10,
+  buttonEntrer:{
+    backgroundColor:'#FCC908',
+    borderRadius:7,
+    marginHorizontal:10,
     paddingHorizontal:10,
-    paddingVertical:5
+    paddingVertical:5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 45
+  },
+  buttonFiltre:{
+    backgroundColor:'#FCC908',
+    borderRadius:7,
+    marginHorizontal:10,
+    paddingHorizontal:10,
+    paddingVertical:5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 52,
+    width:60,
   },
   indicator: {
     flex:1,
@@ -151,16 +280,27 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     
   },
+  infoText: {
+    fontSize: 16,
+    textAlign: 'center',
+    color: "#1E262F",
+    fontWeight: '700',
+    
+  },
+  infoTextDrive: {
+    color: "#1E262F",
+    fontSize: 16,
+    fontWeight: '700',
+  },
   sortContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: 10,
+    
   },
   sortButton: {
-    
-    backgroundColor: "#f2f2f2",
-    
-    height: 50, 
+    borderRadius:7,
+    backgroundColor: "#FCC908",
     width: 238 
   },
 });

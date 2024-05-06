@@ -8,6 +8,7 @@ import {
     Button,
     SafeAreaView,
     ActivityIndicator,
+    TouchableOpacity
 } from "react-native";
 import React from "react";
 import { useState, useEffect } from "react";
@@ -53,43 +54,56 @@ const MemoizedItem = React.memo(({ item }) => {
             <Image source={{ uri: imageUrl }} style={styles.imageSupermarket} /> 
             <Image source={{ uri: item.lien_image }} style={styles.image} /> 
           </View>    
-           
-          <View style={styles.columnMiddle}>
-              
-              <Text style={styles.name}>{item.nom_produit}</Text>   
-          </View>
           
           <View style={styles.columnRight}>
-          
-              <Text style={styles.price}>{item.prix_produit} €</Text>   
-              <Text style={styles.pricePerQuantity}>
-                {item.prix_ratio}{" "}
-                <Text style={styles.quantityUnit}>{item.unite}</Text>
-              </Text>
-  
-              {cart.some((value) => value.id == item.id) ? (
-          
-              <Button title={"Retirer"} onPress={() => removeItemFromCart(item)} style={{
-                borderColor:"gray",
-                backgroundColor: "grey",
-                borderWidth :1,
-                marginVertical: 10,
-                padding:5,
-                width: 60,       
-                }} 
-              />          
-              ):(
-              <Button title={"Ajouter"} onPress={() => addItemToCart(item)} style={{
-                borderColor:"gray",
-                backgroundColor: "white",
-                borderWidth :1,
-                marginVertical: 10,
-                padding:5,
-                width: 60,
-                }} 
-              />
-              
-              )} 
+              <Text style={styles.name}>{item.nom_produit}</Text>   
+
+              <View style={styles.columnInter}>
+                <View style={styles.columnInterLeft}>
+                  <Text style={styles.price}>{item.prix_produit} €</Text>   
+                  <Text style={styles.pricePerQuantity}>
+                    {item.prix_ratio}{" "}
+                    <Text style={styles.pricePerQuantity}>{item.unite}</Text>
+                  </Text>
+                </View>
+                <View style={styles.columnInterRight}>
+                  {cart.some((value) => value.id == item.id) ? (
+                  
+                  <TouchableOpacity 
+                    onPress={() => removeItemFromCart(item)} style={{         
+                      backgroundColor: "grey",
+                      marginVertical: 10,
+                      marginHorizontal: 10,
+                      padding:5,
+                      width: 70, 
+                      height: 40,  
+                      alignItems: 'center',
+                      justifyContent: 'center',  
+                          
+                      }} >
+                    <Text style={styles.infoText} >Retirer</Text>
+                  </TouchableOpacity>
+            
+                  ):(
+                  <TouchableOpacity 
+                    onPress={() => addItemToCart(item)} style={{
+                      backgroundColor: "#FCC908",
+                      borderRadius:7,
+                      marginVertical: 10,
+                      marginHorizontal: 10,
+                      padding:5,
+                      width: 70, 
+                      height: 40,      
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      }} >
+                    <Text style={styles.infoText} >Ajouter</Text>
+                  </TouchableOpacity>
+
+                  
+                  )} 
+                </View>
+              </View>
           </View>
           
         </View>
@@ -102,6 +116,7 @@ const MemoizedItem = React.memo(({ item }) => {
       alignItems: "center",
       justifyContent: "space-between",
       marginVertical: 5,
+      marginHorizontal: 5,
       paddingVertical: 10,
       paddingHorizontal: 5,
       borderRadius: 10,
@@ -113,17 +128,24 @@ const MemoizedItem = React.memo(({ item }) => {
     columnsLeft:{
       width: 80,
       marginLeft: 2,
-      alignItems: "flex-start",
+      marginRight: 40,
       
     },
-    columnMiddle: {
-      flex: 1,
-      marginLeft: 2,
-    },
     columnRight:{       
-         
-      alignItems: "flex-end",
-      marginRight: 2,
+      flex: 1,
+      marginRight: 20,
+      
+    },
+    columnInter:{
+      flexDirection: "row",
+      marginTop:10
+    },
+    columnInterLeft:{    
+    
+    },
+    columnInterRight:{
+    
+      marginLeft: 40,
     },
     imageSupermarket :{
       width: 30,
@@ -134,29 +156,36 @@ const MemoizedItem = React.memo(({ item }) => {
       
     },
     image: {
-      width: 80,
-      height: 80,
-      borderRadius: 10,
+      width: 100,
+      height: 100,
+      borderRadius: 7,
       marginRight: 8,
       
     },
-    
-    name: {
+    infoText: {
       fontSize: 16,
+      textAlign: 'center',
+      color: "#1E262F",
+      fontWeight: '700',
+    },
+
+    name: {
+      fontSize: 18,
       fontWeight: "bold",
+      
     },
     
     pricePerQuantity: {
-      fontSize: 14,
+      fontSize: 18,
       color: "#941919",
-    },
-    quantityUnit: {
-      fontSize: 10,
-      color: "#941919",
+      fontWeight: '700',
+      marginTop: 5,
+      fontWeight: '700',
     },
     price: {
-      fontSize: 14,
+      fontSize: 20,
       marginTop: 5,
+      //color: "#941919",
     },
   });
   

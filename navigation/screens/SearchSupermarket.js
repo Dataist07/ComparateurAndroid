@@ -24,15 +24,8 @@ import SearchSupermarketMap from "./SearchSupermarketStack/SearchSupermarketMap"
 
 const adUnitId = __DEV__ ? TestIds.BANNER : 'ca-app-pub-3515253820147436/9022389604';
 
-const adInterId = __DEV__ ? TestIds.INTERSTITIAL : 'ca-app-pub-3515253820147436/7665624648';
-
-const interstitial = InterstitialAd.createForAdRequest(adInterId , {
-  requestNonPersonalizedAdsOnly: true
-});
-
-const SearchSupermarket = ({navigation}) => {
-
-  const [interstitialLoaded, setInterstitialLoaded] = useState(false);
+const SearchSupermarket = () => {
+  const navigation = useNavigation();
   const [data, setData] = useState([]);
   const [originalData, setOriginalData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -41,39 +34,6 @@ const SearchSupermarket = ({navigation}) => {
   const [filteredData, setFilteredData] = useState([]);
   const [confirmSelection, setConfirmSelection] = useState(false);
   const [selectedItems, setSelectedItems] = useState([]);
-  
-
-  const loadInterstitial = () => {
-    const unsubscribeLoaded = interstitial.addAdEventListener(
-      AdEventType.LOADED,
-      () => {
-        setInterstitialLoaded(true);
-      }
-    );
-
-    const unsubscribeClosed = interstitial.addAdEventListener(
-      AdEventType.CLOSED,
-      () => {
-        setInterstitialLoaded(false);
-        interstitial.load();
-      }
-    );
-
-    interstitial.load();
-
-    return () => {
-      unsubscribeClosed();
-      unsubscribeLoaded();
-    }
-  }
-
-  useEffect(() => {
-    const unsubscribeInterstitialEvents = loadInterstitial();
-
-    return () => {
-      unsubscribeInterstitialEvents();
-    };
-  }, [])
 
   const url = "https://bubu0797.pythonanywhere.com/api/supermarket/";
 
@@ -205,15 +165,8 @@ const SearchSupermarket = ({navigation}) => {
           <Image source={{ uri: imageUri }} style={styles.itemImage} />
           <View style={styles.itemDetails}>
             <Text style={styles.supermarket}>{item.nom_drive}</Text>
-
-            <View style={styles.columnsLeft}>
-              <Text style={styles.city}>{item.city}</Text>
-              <Text style={styles.supermarket}>{item.supermarket}</Text>
-            </View>
-
-            <View style={styles.columnsRight}>
-              <Text style={styles.city}>{"Date maj: "}{item.dateScraped}</Text>
-            </View>
+            <Text style={styles.city}>{item.city}</Text>
+            <Text style={styles.city}>{"Date maj: "}{item.dateScraped}</Text>
             
           </View>
         </View>
@@ -234,18 +187,26 @@ const SearchSupermarket = ({navigation}) => {
           onChangeText={(query) => setSearchQuery(query)}
           value={searchQuery}
         />
-        <Button title={"Entrer"} onPress={handleSearchQuery} style={styles.searchButton} /> 
+        <TouchableOpacity 
+          onPress={handleSearchQuery} style={styles.buttonFiltre} >
+          <Text style={styles.infoText} >Entrer</Text>
+        </TouchableOpacity>
+
       </View>
-      <Button title={displayList ? "Map" : "List"} onPress={toggleDisplay} />
+      <TouchableOpacity 
+        onPress={toggleDisplay} style={styles.buttonMap} >
+        <Text style={styles.infoText} >{displayList ? "Map" : "List"}</Text>
+      </TouchableOpacity>
+
       
       {loading ? (
         <View style={styles.text}>
           <ActivityIndicator/>
-          <Text>Chargement</Text>
+          <Text style={styles.infoText} >Chargement</Text>
         </View>
       ) : confirmSelection === false ? (
         <View style={styles.text}>
-          <Text >Trouvez vos supermarchés</Text>
+          <Text style={styles.infoText} >Trouvez vos supermarchés</Text>
         </View>
         ) : filteredData.length > 0 ?(
           displayList ? (
@@ -258,19 +219,25 @@ const SearchSupermarket = ({navigation}) => {
 
               {selectedItems.length > 0 && (
                 <View style={styles.selectionContainer}>
-                  <Button title="Reset" onPress={resetSelection} />
+                  <TouchableOpacity 
+                    onPress={resetSelection} style={styles.buttonFiltre} >
+                    <Text style={styles.infoText} >Reset</Text>
+                  </TouchableOpacity>
+
                   <Text style={styles.selectionText}>
                     Limite : {selectedItems.length}/2
                   </Text>
                         
-                  {interstitialLoaded ? 
-                    <Button title="Choisir" onPress=
-                    {() =>{ 
-                      interstitial.show();
+               
+                  <TouchableOpacity 
+                    onPress= {() =>{ 
+                
                       handleConfirmSelection(); 
-                    }}/>
-                    : <ActivityIndicator/>
-                  }        
+                    }} style={styles.buttonFiltre} >
+                    <Text style={styles.infoText} >Choisir</Text>
+                  </TouchableOpacity>
+
+  
                 </View>
               )}
             </SafeAreaView>
@@ -307,6 +274,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
    
   },
+  infoText: {
+    fontSize: 16,
+    textAlign: 'center',
+    marginBottom: 20,
+  },
   searchContainer: {
     marginVertical: 10,
     padding: 10,
@@ -317,7 +289,7 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     flex:1,
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "bold",
     color: "#333",
   },
@@ -346,26 +318,29 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   selectedItemContainer: {
-    backgroundColor: "#e6ffe6",
-    borderColor: "green",
+    backgroundColor: "#fcedb6",
+    borderColor: "#FCC908",
   },
   itemContent: {
     flexDirection: "row",
     alignItems: "center",
+    
   },
   itemImage: {
     width: 60,
     height: 60,
     borderRadius: 30,
-    marginRight: 10,
+    marginRight: 5,
+    marginHorizontal:5,
   },
   itemDetails: {},
   supermarket: {
-    fontSize: 18,
+    fontSize: 22,
     width: 280,
     fontWeight: "bold",
     color: "#333",
     marginBottom: 5,
+    
   },
   city: {
     fontSize: 14,
@@ -385,16 +360,38 @@ const styles = StyleSheet.create({
     backgroundColor: "#f2f2f2",
   },
   selectionText: {
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: "bold",
     color: "#333",
-    marginRight: 10,
+
   },
-  columnsRight:{
-    width: 200,
+
+  buttonFiltre:{
+    backgroundColor:'#FCC908',
+    borderRadius:7,
+    marginHorizontal:5,
+    paddingHorizontal:10,
+    paddingVertical:5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 45,
+    width:80,
   },
-  columnsLeft:{
-    width: 240,
+  buttonMap:{
+    backgroundColor:'#FCC908',
+    borderRadius:7,
+    marginHorizontal:5,
+    paddingHorizontal:10,
+    paddingVertical:5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 40,
+  },
+  infoText: {
+    fontSize: 16,
+    textAlign: 'center',
+    color: "#1E262F",
+    fontWeight: '700',
     
   },
 });

@@ -1,5 +1,6 @@
 {
   "expo": {
+
     "name": "Comparator",
     "slug": "Comparator",
     "version": "1.0.1",
@@ -20,12 +21,11 @@
     },
     "android": {
       "package": "com.minh0797.Comparator",
-      "versionCode":3,
+      "versionCode": 3,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       }
-      
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -34,7 +34,17 @@
       "eas": {
         "projectId": "1d2e618d-7111-4215-85ee-57993558c526"
       }
-    }
+    },
+    "plugins": [
+      [ "expo-camera",
+        {
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
+          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
+          "recordAudioAndroid": true
+        }
+      ]
+    
+    ]
   },
   "react-native-google-mobile-ads": {
     "android_app_id": "ca-app-pub-3515253820147436~7971391760",

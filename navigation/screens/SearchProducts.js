@@ -3,22 +3,23 @@ import {View, Text, StyleSheet,SafeAreaView,Button,ActivityIndicator } from "rea
 import { useEffect, useState } from "react";
 import SearchProductSupermarketFiltered from "./SearchProductStack/SearchProductSupermarketFiltered";
 import { StatusBar } from 'expo-status-bar';
-import { BannerAd, BannerAdSize, TestIds, InterstitialAd, AdEventType, RewardedInterstitialAd, RewardedAdEventType } from 'react-native-google-mobile-ads';
+
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
-const adUnitId = __DEV__ ? TestIds.BANNER : 'ca-app-pub-3515253820147436/7984640105';
+
 const SearchProducts = ({ route }) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   
   const navigation = useNavigation();
-  const { selectedDrives } = route.params;
+  const { selectedDrives } = route.params; 
+ 
 
-
-  useEffect(() => {
+  useEffect(  () => {
     fetchData();
+    
   }, []);
 
 
@@ -97,22 +98,28 @@ const SearchProducts = ({ route }) => {
       // Once all promises are resolved, update state with fetched data
       setData(fetchedData);
       setLoading(false);
+
     } catch (error) {
       console.error('Error fetching data:', error);
       setLoading(false);
     }
   };
   
-
+  useEffect(() => {
+    if (!loading) {
+      navigation.navigate("Cherchez vos produits", { data, selectedDrives });
+    }
+  }, [loading]);
+  
 
   return (
     
       <SafeAreaView style={styles.container}>
         <View >
-          <Text>Drives Choisis: </Text>
+          <Text style={styles.infoText}>Drives Choisis: </Text>
         </View>
         {selectedDrives.map(({ nom_drive }, index) => (
-          <Text key={index}>
+          <Text style={styles.infoText} key={index}>
             - {nom_drive}
           </Text>
         ))}
@@ -121,24 +128,18 @@ const SearchProducts = ({ route }) => {
           <View style={styles.indicator}>
             <ActivityIndicator/>
             <View style={styles.text}>
-              <Text>Téléchargement des données.</Text>
-              <Text>L'opération prend environ 1 minute.</Text>
-              <Text>Veuilez ne pas quitter l'application durant cette opération.</Text>
-              <Text style={styles.text}>Si à la fin du chargement aucun produit est trouvé lors de vos recherches, quittez l'application puis réouvrez.</Text>
+              <Text style={styles.infoText}>Téléchargement des données.</Text>
+              <Text style={styles.infoText}>L'opération prend environ 1 minute.</Text>
+              <Text style={styles.infoText}>Veuilez ne pas quitter l'application durant cette opération.</Text>
+              <Text style={styles.infoText}>Si à la fin du chargement aucun produit est trouvé lors de vos recherches, quittez l'application puis réouvrez.</Text>
             </View>
           </View>
         ) : (
           <>
-            <SearchProductSupermarketFiltered data={data}/>
+
           </>
         )}
-         <BannerAd style={styles.ad}
-          unitId={adUnitId}
-          size={BannerAdSize.FULL_BANNER}
-          requestOptions={{
-              requestNonPersonalizedAdsOnly: true
-          }}
-        />
+
       
       </SafeAreaView>
     
@@ -149,7 +150,7 @@ const SearchProducts = ({ route }) => {
     flexDirection: 'column',
     padding: 10,
     justifyContent: 'flex-start',
-    height: '84%',
+    height: '100%',
     backgroundColor: "#fff",
   },
   indicator: {
@@ -162,6 +163,11 @@ const SearchProducts = ({ route }) => {
     marginTop: 40,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  infoText: {
+    fontSize: 16,
+    fontWeight: '700',
+    
   },
   ad: {
     flex:1,
