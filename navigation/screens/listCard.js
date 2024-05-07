@@ -60,7 +60,6 @@ return (
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        paddingHorizontal: 20,
         justifyContent: 'space-arround',
         flexDirection: 'row',
         flexWrap: 'wrap',

@@ -1,20 +1,22 @@
-import { View, Text, StyleSheet, TouchableOpacity,  TextInput,Image, Linking } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity,  TextInput,Button,Alert } from 'react-native';
 import React, { useEffect, useState, useRef } from "react";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from "@react-navigation/native";
-import { CameraView, useCameraPermissions } from 'expo-camera';
+import { BarCodeScanner } from 'expo-barcode-scanner';
 
 const AddCards = () => {
     const [nameCard, setNameCard] = useState('');
     const [numCard, setNumCard] = useState('');
     const navigation = useNavigation();
     
-
     const handleAddCard = async () => {
         try {
-            // Ensure numCard is set to an integer
-            //const parsedNumCard = parseInt(numCard);
-
+            // Check if nameCard or numCard is empty
+            if (!nameCard.trim() || !numCard.trim()) {
+                // If any field is empty, display an alert
+                Alert.alert('Erreur', 'Veuillez remplir tous les champs.');
+                return;
+            }
             // Retrieve the existing list of cards from AsyncStorage
             const storedListCards = await AsyncStorage.getItem('listCards');
             let listCards = [];
@@ -31,7 +33,7 @@ const AddCards = () => {
             await AsyncStorage.setItem('listCards', JSON.stringify(listCards));
 
             // Navigate to the next screen
-            navigation.navigate("Liste des cartes");
+            navigation.navigate("Cartes", {nameCard});
             console.log(listCards)
            
         } catch (error) {
@@ -39,9 +41,42 @@ const AddCards = () => {
         }
     };
 
+    //Barcode scanner
+    const [hasPermission, setHasPermission] = useState(null);
+    const [scanned, setScanned] = useState(false);
+
+    useEffect(() => {
+        const getBarCodeScannerPermissions = async () => {
+        const { status } = await BarCodeScanner.requestPermissionsAsync();
+        setHasPermission(status === 'granted');
+        };
+
+        getBarCodeScannerPermissions();
+    }, []);
+
+    const handleBarCodeScanned = ({ type, data }) => {
+        setScanned(true);
+        alert(`Bar code with type ${type} and data ${data} has been scanned!`);
+        setNumCard(data);
+    };
+
+    if (hasPermission === null) {
+        return <Text>Requesting for camera permission</Text>;
+    }
+    if (hasPermission === false) {
+        return <Text>No access to camera</Text>;
+    }
+
+
     return (
         <View style={styles.container}>
-
+            <View style={styles.containerCamera}>
+                <BarCodeScanner
+                    onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+                    style={StyleSheet.absoluteFillObject}
+                />
+                {scanned && <Button title={'Tap to Scan Again'} onPress={() => setScanned(false)} />}
+            </View>
             <TextInput
                 value={nameCard}
                 style={styles.input}
@@ -55,8 +90,8 @@ const AddCards = () => {
                 value={numCard}
                 style={styles.input}
                 placeholder="Numero de la carte" // French placeholder text
-                onChangeText={text => setNumCard(text.replace(/[^0-9]/g, ''))} // Allow only numbers
-                keyboardType="numeric" // Show numeric keyboard
+                onChangeText={setNumCard} // Allow only numbers
+                multiline={true} // Allow multiple lines for body content
                 placeholderTextColor="#aaa" // Faded placeholder text
             />
 
@@ -74,7 +109,12 @@ const AddCards = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        paddingHorizontal: 20,
+        paddingHorizontal: 10,
+        justifyContent: 'center',
+    },
+    containerCamera:{
+        flex: 1,
+        paddingHorizontal: 10,
         justifyContent: 'center',
     },
     input: {
@@ -102,6 +142,12 @@ const styles = StyleSheet.create({
         color: "#1E262F",
         fontWeight: '700',
     },
+    //Camera
+    camera: {
+        flex: 1,
+      },
+
+      
 });
 
 export default AddCards;

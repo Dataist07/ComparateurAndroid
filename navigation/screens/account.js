@@ -71,7 +71,8 @@ const styles = StyleSheet.create({
     },
     input: {
     marginVertical: 10,
-    height: 50,
+    height: 100,
+    
     borderWidth: 1,
     borderRadius: 8, // Rounded corners
     padding: 10,
