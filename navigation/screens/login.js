@@ -1,22 +1,16 @@
 import { View, Text, Button,ActivityIndicator, StyleSheet,TextInput,TouchableOpacity} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {FirebaseAuth} from '../../firebaseConfig';
 import {signInWithEmailAndPassword,createUserWithEmailAndPassword} from 'firebase/auth';
 
 import React, { useEffect, useState } from "react";
-import { deleteAllCart } from "../../store/CartSlice";
-import { useSelector, useDispatch  } from "react-redux";
 
 const Login = () =>{
     const navigation = useNavigation();
-    const dispatch = useDispatch();
-
     const tryApplication = async () => {
-        await AsyncStorage.clear();
-        await dispatch(deleteAllCart()); 
-        navigation.navigate("App");
+
+        navigation.navigate("AppTry");
       };
 
     const [email, setEmail] = useState('') ;
@@ -92,7 +86,7 @@ return (
         </View>
       )}
 
-      <Text style={styles.textInformation}>Note: Pour sauvegarder vos sélections de drives et votre liste de courses, veuillez créer un compte ou vous connecter.</Text>
+      <Text style={styles.textInformation}>Note: Pour pouvoir utiliser les fonctions liste de courses et cartes de fidélités, veuillez créer un compte ou vous connecter.</Text>
 
       <TouchableOpacity 
         onPress={tryApplication} style={styles.buttonFiltre} >

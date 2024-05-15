@@ -156,6 +156,28 @@ function TabNavigator() {
   );
 }
 
+function TabNavigatorTry() {
+  return (
+    <Tab.Navigator
+      screenOptions={({ route, navigation }) => ({
+        tabBarIcon: ({ color, focused, size }) => {
+          let iconName;
+          if (route.name === "Supermarchés/Produits"){
+            iconName = focused ? "search" : "search-outline";
+          } else if (route.name === "Profil"){
+            iconName = focused ? "person" : "person-outline";
+          }
+          
+          return <Ionicons name={iconName} size={size} color={color} />
+        },
+      })}
+    >
+      <Tab.Screen name="Supermarchés/Produits" component={SupermarketsStack} options={{ headerShown: false }}/>
+      <Tab.Screen name="Profil" component={ProfilsStack} options={{ headerShown: false }} />
+    </Tab.Navigator>
+  );
+}
+
 const Stack = createNativeStackNavigator();
 // Main
 export default function MainContainer() {
@@ -181,8 +203,8 @@ export default function MainContainer() {
               <>
                 <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
                 <Stack.Screen
-                  name="App" // Consider a more descriptive name
-                  component={TabNavigator} // Wrap TabNavigator with Screen
+                  name="AppTry" // Consider a more descriptive name
+                  component={TabNavigatorTry} // Wrap TabNavigator with Screen
                   options={{ headerShown: false }}
                 />
               </>

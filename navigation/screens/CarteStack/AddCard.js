@@ -19,22 +19,22 @@ const AddCards = () => {
             }
             // Retrieve the existing list of cards from AsyncStorage
             const storedListCards = await AsyncStorage.getItem('listCards');
-            let listCards = [];
+            let listCardsToStore = [];
 
             // If there is an existing list, parse it from JSON
             if (storedListCards) {
-                listCards = JSON.parse(storedListCards);
+                listCardsToStore = JSON.parse(storedListCards);
             }
 
             // Add the new card to the list
-            listCards.push({ nameCard, numCard: numCard });
+            listCardsToStore.push({ nameCard, numCard: numCard });
 
             // Save the updated list of cards to AsyncStorage
-            await AsyncStorage.setItem('listCards', JSON.stringify(listCards));
+            await AsyncStorage.setItem('listCards', JSON.stringify(listCardsToStore));
 
             // Navigate to the next screen
-            navigation.navigate("Cartes", {nameCard});
-            console.log(listCards)
+            navigation.navigate("Liste des cartes", {listCardsToStore});
+            console.log(listCardsToStore)
            
         } catch (error) {
             console.error('Error saving card:', error);

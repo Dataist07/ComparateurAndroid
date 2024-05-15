@@ -1,12 +1,14 @@
-import { View, Text, Button,ActivityIndicator, StyleSheet,TextInput,TouchableOpacity} from 'react-native';
+import { View, Text, Button,ActivityIndicator, StyleSheet,TextInput,TouchableOpacity,Alert} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {FirebaseAuth} from '../../firebaseConfig';
-import {signInWithEmailAndPassword,createUserWithEmailAndPassword} from 'firebase/auth';
+import { getAuth, deleteUser } from "firebase/auth";
 import email from 'react-native-email'
 import React, { useEffect, useState } from "react";
+import { BannerAd, BannerAdSize, TestIds, InterstitialAd, AdEventType, RewardedInterstitialAd, RewardedAdEventType } from 'react-native-google-mobile-ads';
 
+const adUnitId = __DEV__ ? TestIds.BANNER : 'ca-app-pub-3515253820147436/6423591824';
 const Account = () =>{
    
     //const [subject, setSubject] = useState('');
@@ -26,6 +28,37 @@ const Account = () =>{
             alert('Failed to send email. Please try again.');
         }
     };
+
+    const handleDeletUser = () => {
+        const auth = getAuth();
+        const user = auth.currentUser;
+        
+
+        // Show confirmation alert
+        Alert.alert(
+            'Confirmation',
+            'Êtes-vous sûr de vouloir supprimer ce compte ?',
+            [
+                {
+                    text: 'Annuler',
+                    style: 'cancel',
+                },
+                {
+                    text: 'Supprimer',
+                    onPress: () => {
+
+                        deleteUser(user).then(() => {
+                            // User deleted.
+                          }).catch((error) => {
+                            // An error ocurred
+                            // ...
+                          });
+                    },
+                },
+            ]
+        );
+
+    };
 return (
     <View style={styles.container}>
         <Text style={styles.title}>Écrivez-nous</Text>
@@ -44,7 +77,6 @@ return (
             <Text style={styles.infoText} >Envoyer le message</Text>
         </TouchableOpacity>
 
-        <View style={styles.spacer} />
 
         {/* Disconnect button with improved styling */}
         <View style={styles.buttonContainer}>
@@ -52,7 +84,19 @@ return (
                 onPress={() => FirebaseAuth.signOut()} style={styles.button} >
                 <Text style={styles.infoText} >Déconnexion</Text>
             </TouchableOpacity>
+
+            <TouchableOpacity 
+                onPress={handleDeletUser} style={styles.buttonDelete} >
+                <Text style={styles.infoText} >Supprimer le compte</Text>
+            </TouchableOpacity>
         </View>
+        <BannerAd 
+        unitId={adUnitId}
+        size={BannerAdSize.FULL_BANNER}
+        requestOptions={{
+          requestNonPersonalizedAdsOnly: true
+        }}
+      />
     </View>
     );
 };
@@ -66,8 +110,8 @@ const styles = StyleSheet.create({
     title: {
     fontSize: 28,
     fontWeight: 'bold',
-    marginBottom: 20,
     textAlign: 'center',
+    marginTop:150
     },
     input: {
     marginVertical: 10,
@@ -87,6 +131,18 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         height: 40,
+        marginTop:40
+      },
+      buttonDelete:{
+        backgroundColor:'#ff0000',
+        borderRadius:7,
+        marginHorizontal:5,
+        paddingHorizontal:10,
+        paddingVertical:5,
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: 40,
+        marginTop:40
       },
       infoText: {
         fontSize: 16,
@@ -96,7 +152,8 @@ const styles = StyleSheet.create({
         
       },
     buttonContainer: {
-        marginTop: 300,
+        marginTop: 150,
+        marginBottom:50,
     },
 });
 

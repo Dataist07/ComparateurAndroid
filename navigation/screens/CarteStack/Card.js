@@ -3,7 +3,9 @@ import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import Barcode from 'react-native-barcode-svg';
+import { BannerAd, BannerAdSize, TestIds, InterstitialAd, AdEventType, RewardedInterstitialAd, RewardedAdEventType } from 'react-native-google-mobile-ads';
 
+const adUnitId = __DEV__ ? TestIds.BANNER : 'ca-app-pub-3515253820147436/8826641308';
 const Cards = ({ route }) => {
     const { nameCard } = route.params;
     const [numCard, setNumCard] = useState('');
@@ -70,9 +72,16 @@ const Cards = ({ route }) => {
             <Text style={styles.infoText}>{numCard}</Text>
             <View style={styles.container2}>
                 <TouchableOpacity onPress={handleDeleteCard} style={styles.deleteButton}>
-                    <Text style={styles.deleteButtonText}>Delete Card</Text>
+                    <Text style={styles.deleteButtonText}>Supprimer la carte</Text>
                 </TouchableOpacity>
             </View>
+            <BannerAd 
+                unitId={adUnitId}
+                size={BannerAdSize.FULL_BANNER}
+                requestOptions={{
+                requestNonPersonalizedAdsOnly: true
+                }}
+            />
         </View>
     );
 };
@@ -86,6 +95,7 @@ const styles = StyleSheet.create({
     },
     container2: {
         marginTop:250,
+        marginBottom:50
     },
     title:{
         fontSize: 30,

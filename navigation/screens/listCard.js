@@ -1,25 +1,26 @@
 import { View, Text, Button,ActivityIndicator, StyleSheet,TextInput,TouchableOpacity,ScrollView} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
 import React, { useEffect, useState } from "react";
+import { BannerAd, BannerAdSize, TestIds, InterstitialAd, AdEventType, RewardedInterstitialAd, RewardedAdEventType } from 'react-native-google-mobile-ads';
 
-const ListCard = () =>{
+const adUnitId = __DEV__ ? TestIds.BANNER : 'ca-app-pub-3515253820147436/7736673490';
+const ListCard = ({ route }) =>{
+
     const [listCards, setListCards] = useState([]);
   
     const navigation = useNavigation();
     
     const fetchListCards = async () => {
-        try {
-            const storedListCards = await AsyncStorage.getItem('listCards');
-            if (storedListCards) {
-                const parsedListCards = JSON.parse(storedListCards);
-                setListCards(parsedListCards);
-            }
-        } catch (error) {
-            console.error('Error fetching list of cards:', error);
+      
+        const storedListCards = await AsyncStorage.getItem('listCards');
+        if (storedListCards) {
+            const parsedListCards = JSON.parse(storedListCards);
+            setListCards(parsedListCards);
         }
+   
     };
+
 
     useEffect(() => {
         fetchListCards();    
@@ -53,6 +54,13 @@ return (
             </TouchableOpacity>
         
         </View>
+        <BannerAd 
+        unitId={adUnitId}
+        size={BannerAdSize.FULL_BANNER}
+        requestOptions={{
+          requestNonPersonalizedAdsOnly: true
+        }}
+      />
     </ScrollView>
     );
 };
