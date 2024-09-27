@@ -37,11 +37,12 @@ const SearchProducts = ({ route }) => {
       if (docSnap.exists()) {
         const cartData = docSnap.data();
         dispatch(replaceCart(cartData.cart));
-        setGetData(true);
+        
         console.log("Read cart");
       }       
     }
     getData();
+    setGetData(true);
 
   }, []);
 
@@ -186,6 +187,7 @@ const SearchProducts = ({ route }) => {
     padding: 10,
     justifyContent: 'flex-start',
     backgroundColor: "#fff",
+    height:'100%'
   },
   indicator: {
     flex:1,
