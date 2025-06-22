@@ -123,15 +123,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     },
     button:{
-        backgroundColor:'#FCC908',
-        borderRadius:7,
-        marginHorizontal:10,
-        paddingHorizontal:5,
-        paddingVertical:5,
+        backgroundColor: '#FFDB14',
+        borderRadius: 7,
+        marginHorizontal: 10,
+        paddingHorizontal: 5,
+        paddingVertical: 5,
         alignItems: 'center',
         justifyContent: 'center',
         height: 45,
-        marginTop:40
+        marginTop:40,
+        borderColor: "#1E262F",
+        borderWidth: 1,
       },
       buttonDelete:{
         backgroundColor:'#ff0000',
@@ -141,8 +143,10 @@ const styles = StyleSheet.create({
         paddingVertical:5,
         alignItems: 'center',
         justifyContent: 'center',
-        height: 45,
-        marginTop:40
+        height: 40,
+        marginTop:40,
+        borderColor: "#1E262F",
+        borderWidth: 1,
       },
       infoText: {
         fontSize: 16,
@@ -156,5 +160,6 @@ const styles = StyleSheet.create({
         marginBottom:50,
     },
 });
+
 
 export default Account;

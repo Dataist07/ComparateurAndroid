@@ -5,6 +5,15 @@ import {Provider, useSelector} from 'react-redux';
 import { addDoc } from 'firebase/firestore'
 import React, { useEffect, useState } from "react";
 import { getAuth } from "firebase/auth";
+import { 
+  View, 
+  SafeAreaView, 
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableWithoutFeedback,
+  Keyboard,
+} from 'react-native';
 // redux persist
 import {PersistGate} from 'redux-persist/integration/react';
 import {persistStore} from 'redux-persist';
@@ -19,11 +28,20 @@ export default function App() {
 
   return(
     
-    <Provider store = {store}>
+    <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
-        <MainContainer/>
-        <StatusBar style="auto" />
+        <KeyboardAvoidingView
+          style={{flex: 1}}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+            <SafeAreaView style={{flex: 1}}>
+              <MainContainer />
+              <StatusBar style="auto" />
+            </SafeAreaView>
+          </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
       </PersistGate>
-    </Provider>    
+    </Provider>   
     );
   }

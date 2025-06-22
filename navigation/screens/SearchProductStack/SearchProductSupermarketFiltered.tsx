@@ -12,6 +12,7 @@ import {
   SafeAreaView,
   ActivityIndicator,
   TouchableOpacity,
+  Keyboard
   
 } from "react-native";
 import { MemoizedItem } from "./MemoizedItem";
@@ -22,6 +23,7 @@ import { doc, setDoc } from "firebase/firestore";
 import { FirebaseDB } from "../../../component/firebaseConfig";
 import { useSelector } from "react-redux";
 import { searchProductBanner } from "../../../component/idAdmob";
+
 
 const adUnitId = __DEV__ ? TestIds.BANNER : searchProductBanner;
 
@@ -46,18 +48,28 @@ const SearchProductSupermarketFiltered = ({listRayonsFilter,data,selectedDrives 
         ? allItems.filter((item) => {
             const itemDataWithoutAccent = item.nom_produit
               ? item.nom_produit.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").split(" ")
-              : "";
+              : [];
             const textParts = searchQuery.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").split(" ");
 
             return textParts.every((part) => itemDataWithoutAccent.some((itemPart) => itemPart.startsWith(part)));
           })
         : [];
 
-      setFilteredData(filteredData);
-      setLoading(false);
+      // Deduplicate filteredData by nom_produit, keeping only the first occurrence
+      const uniqueFilteredData = [];
+      const seenNomProduit = new Set();
 
+      for (const item of filteredData) {
+        if (!seenNomProduit.has(item.nom_produit)) {
+          seenNomProduit.add(item.nom_produit);
+          uniqueFilteredData.push(item);
+        }
+      }
+
+      setFilteredData(uniqueFilteredData);
+      setLoading(false);
     }, 1); // 1/1000 seconds
-   
+    Keyboard.dismiss();
   };
 
 
@@ -126,7 +138,7 @@ const SearchProductSupermarketFiltered = ({listRayonsFilter,data,selectedDrives 
   }, [listRayonsFilter2,filteredData]); 
 
 
-  const [sortOption, setSortOption] = useState({ sortBy: "prix_produit", sortOrder: "asc" });
+  const [sortOption, setSortOption] = useState({ sortBy: "prix_ratio", sortOrder: "asc" });
   
   // Sort the data based on sortOption
   const sortedData = [...filteredRayonData].sort((a, b) => {
@@ -137,12 +149,22 @@ const SearchProductSupermarketFiltered = ({listRayonsFilter,data,selectedDrives 
     }
   });
 
+  // Filter to only include the first item with each unique nom_produit
+  const uniqueNomProduitSet = new Set();
+  const filteredUniqueData = sortedData.filter(item => {
+    if (!uniqueNomProduitSet.has(item.nom_produit)) {
+      uniqueNomProduitSet.add(item.nom_produit);
+      return true; // Include this item
+    }
+    return false; // Exclude duplicates
+  });
+
   // Options for sorting
   const sortOptions = [
-    { label: "Prix croissant", value: { sortBy: "prix_produit", sortOrder: "asc" } },
-    { label: "Prix décroissant", value: { sortBy: "prix_produit", sortOrder: "desc" } },
     { label: "Prix à l'unité croissant", value: { sortBy: "prix_ratio", sortOrder: "asc" } },
     { label: "Prix à l'unité décroissant", value: { sortBy: "prix_ratio", sortOrder: "desc" } },
+    { label: "Prix croissant", value: { sortBy: "prix_produit", sortOrder: "asc" } },
+    { label: "Prix décroissant", value: { sortBy: "prix_produit", sortOrder: "desc" } },
   ];
   
   return (
@@ -192,11 +214,11 @@ const SearchProductSupermarketFiltered = ({listRayonsFilter,data,selectedDrives 
             <ActivityIndicator />
             <Text style={styles.infoText}>Chargement</Text>
           </View>
-        ) : sortedData.length > 0 ? (
+        ) : filteredUniqueData.length > 0 ? (
           <>
 
             <FlatList
-              data={sortedData}
+              data={filteredUniqueData}
               keyExtractor={(item) => item.id.toString()}
               renderItem={({ item }) => <MemoizedItem item={item} />} // Use the MemoizedItem component
               estimatedItemSize={300}
@@ -219,19 +241,13 @@ const SearchProductSupermarketFiltered = ({listRayonsFilter,data,selectedDrives 
   );
 };
 
+
 const styles = StyleSheet.create({
 
   container: {
-    height:'92%',
+    height:'93%',
     backgroundColor: "#fff",
   },
-  container2: {
-    flexDirection: 'column',
-    marginTop:10,
-    justifyContent: 'flex-start',
-    backgroundColor: "#fff",
-  },
-
   searchContainer: {
     marginVertical: 10,
     padding: 10,
@@ -239,6 +255,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#f2f2f2",
     flexDirection: 'row',
     justifyContent: 'space-between',
+    borderColor: "#1E262F",
+    borderWidth: 1,
   },
   searchInput: {
     flex:1,
@@ -248,17 +266,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   buttonEntrer:{
-    backgroundColor:'#FCC908',
-    borderRadius:7,
-    marginHorizontal:10,
-    paddingHorizontal:10,
-    paddingVertical:5,
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: 45
-  },
-  buttonFiltre:{
-    backgroundColor:'#FCC908',
+    backgroundColor:'#FFDB14',
     borderRadius:7,
     marginHorizontal:10,
     paddingHorizontal:10,
@@ -266,7 +274,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     height: 45,
-    width:60,
+    borderColor: "#1E262F",
+    borderWidth: 1,
+  },
+  buttonFiltre:{
+    backgroundColor:'#FFDB14',
+    borderRadius:7,
+    marginHorizontal:10,
+    paddingHorizontal:10,
+    paddingVertical:5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 52,
+    width:70,
+    borderColor: "#1E262F",
+    borderWidth: 1,
   },
   indicator: {
     flex:1,
@@ -279,6 +301,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: "#1E262F",
     fontWeight: '700',
+    
     
   },
   infoTextDrive: {
@@ -294,7 +317,7 @@ const styles = StyleSheet.create({
   },
   sortButton: {
     borderRadius:7,
-    backgroundColor: "#FCC908",
+    backgroundColor: "#FFDB14",
     width: 238 
   },
 });

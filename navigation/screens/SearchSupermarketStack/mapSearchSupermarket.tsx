@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { StyleSheet, Text, SafeAreaView, Image } from "react-native";
+import { StyleSheet, Text, SafeAreaView, Image, View } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 
 const SearchSupermarketMap = ({ filteredData }) => {
@@ -45,14 +45,20 @@ const SearchSupermarketMap = ({ filteredData }) => {
     switch (supermarket) {
       case "Carrefour":
         return require('./Static/CarrefourIcon.png'); // Use the correct path to your Carrefour icon
+      case "CarrefourMarket":
+        return require('./Static/CarrefourMarketIcon.png'); 
       case "Auchan":
         return require('./Static/AuchanIcon.png'); // Use the correct path to your Auchan icon
-      case "Casino":
-        return require('./Static/CasinoIcon.jpg'); // Use the correct path to your Casino icon
       case "Leclerc":
         return require('./Static/LeclercIcon.png'); // Use the correct path to your Leclerc icon
-      case "Intermarche":
-        return require('./Static/IntermarcheIcon.png'); // Use the correct path to your Casino icon
+      case "HyperIntermarche":
+        return require('./Static/HyperIntermarcheIcon.png'); 
+      case "SuperIntermarche":
+        return require('./Static/SuperIntermarcheIcon.png'); 
+      case "HyperU":
+        return require('./Static/HyperUIcon.png');
+      case "SuperU":
+        return require('./Static/SuperUIcon.png');
       default:
         return require('./Static/defaultIcon.jpg'); // Use a default icon or provide a default path
     }
@@ -82,10 +88,15 @@ const SearchSupermarketMap = ({ filteredData }) => {
             }}
             title={item.nom_drive}
           >
-            <Image
-              source={getMarkerIcon(item.supermarket)}
-              style={{ width: 40, height: 40 }} // Set your desired width and height
-            />
+            <View style={styles.markerPin}>
+              <View style={styles.markerIconWrapper}>
+                <Image
+                  source={getMarkerIcon(item.supermarket)}
+                  style={styles.markerIconImage}
+                />
+              </View>
+              <View style={styles.markerPinTip} />
+            </View>
           </Marker>
         ))}
       </MapView>
@@ -102,12 +113,48 @@ const styles = StyleSheet.create({
   selectionText: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#333",
+    color: "#202c38",
     marginRight: 10,
   },
   map: {
     flex: 1,
   },
+  markerPin: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  markerIconWrapper: {
+    backgroundColor: '#fff',
+    borderRadius: 25,
+    padding: 4,
+    borderWidth: 2,
+    borderColor: '#202c38',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  markerIconImage: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    resizeMode: 'contain',
+  },
+  markerPinTip: {
+    width: 0,
+    height: 0,
+    borderLeftWidth: 9,
+    borderRightWidth: 9,
+    borderTopWidth: 16,
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
+    borderTopColor: '#202c38',
+    marginTop: -2,
+  },
 });
+
 
 export default SearchSupermarketMap;

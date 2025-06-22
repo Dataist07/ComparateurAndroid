@@ -113,16 +113,17 @@ const styles = StyleSheet.create({
         marginVertical: 10,
     },
     deleteButton: {
-       
-        backgroundColor: '#FCC908',
-        borderRadius:7,
-        marginHorizontal:10,
-        paddingHorizontal:5,
-        paddingVertical:5,
+        backgroundColor: '#FFDB14',
+        borderRadius: 7,
+        marginHorizontal: 10,
+        paddingHorizontal: 5,
+        paddingVertical: 5,
         alignItems: 'center',
         justifyContent: 'center',
         height: 45,
         marginTop: 20,
+        borderColor: "#1E262F",
+        borderWidth: 1,
     },
     deleteButtonText: {
         color: '#1E262F',

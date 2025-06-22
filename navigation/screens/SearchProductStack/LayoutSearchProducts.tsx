@@ -22,44 +22,52 @@ const SearchProducts = ({ route }) => {
   const { selectedDrives,listRayonsFilter } = route.params; 
 
   //get cart from firebase
-  const auth = getAuth();
-  const user = auth.currentUser;
-  const userUid = user.email;
-  const uidCart = 'Cart'+userUid 
   const dispatch = useDispatch();
   const cart = useSelector((state) => state.cart.cart);
 
-  useEffect (() => {
-    const getData = async () => {
-      const docRef = doc(FirebaseDB, "cart",uidCart);
-      const docSnap = await getDoc(docRef);
+  const auth = getAuth();
+  const user = auth.currentUser;
 
-      if (docSnap.exists()) {
-        const cartData = docSnap.data();
-        dispatch(replaceCart(cartData.cart));
-        
-        console.log("Read cart");
-      }       
-    }
-    getData();
-    setGetData(true);
-
-  }, []);
-
-  //import cart to firebase
-  useEffect (() => {
-    const pushData = async () => {
-
-        await setDoc(doc(FirebaseDB, "cart",uidCart ), {
-          cart,
-        });
-        //console.log(cart)
-    }
-    if (getData==true){
-      pushData();
-      console.log('Create cart')
-    }
-  }, [cart]);
+  if (user != null){
+    const userUid = user.email;
+    const uidCart = 'Cart'+userUid 
+    useEffect (() => {
+    
+      const getData = async () => {
+        const docRef = doc(FirebaseDB, "cart",uidCart);
+        const docSnap = await getDoc(docRef);
+  
+        if (docSnap.exists()) {
+          const cartData = docSnap.data();
+          dispatch(replaceCart(cartData.cart));
+          console.log("Read cart");
+        }       
+      }
+      getData();
+      setGetData(true);
+    }, []);
+  
+    //import cart to firebase
+    useEffect (() => {
+      console.log(user)
+      const pushData = async () => {
+          console.log(uidCart)
+          
+          try {
+            await setDoc(doc(FirebaseDB, "cart", uidCart), { cart });
+            console.log("Cart written to Firestore");
+          } catch (error) {
+            console.error("Error writing cart:", error);
+          }
+          //console.log(cart)
+      }
+      if (getData==true){
+        pushData();
+        console.log('Create cart')
+      }
+    }, [cart]);
+    
+  }
 
   useEffect(  () => {
     fetchData();
@@ -79,7 +87,7 @@ const SearchProducts = ({ route }) => {
 
     // Store each chunk separately
     for (let i = 0; i < chunks.length; i++) {
-      const chunkKey = `${nom_drive}_${i}`;
+      const chunkKey = `Products_${nom_drive}_${i}`;
       await AsyncStorage.setItem(chunkKey, JSON.stringify({ nom_drive, nom_driveUrl, dateScraped, chunk: chunks[i] }));
       console.log('Chunk size:', JSON.stringify(chunks[i]).length);
 
@@ -89,7 +97,7 @@ const SearchProducts = ({ route }) => {
   const getLocalData = async (nom_drive) => {
     try {
       const chunkKeys = await AsyncStorage.getAllKeys();
-      const nom_driveChunks = chunkKeys.filter((key) => key.startsWith(`${nom_drive}_`));
+      const nom_driveChunks = chunkKeys.filter((key) => key.startsWith(`Products_${nom_drive}_`));
       
   
       if (nom_driveChunks.length > 0) {
@@ -119,7 +127,7 @@ const SearchProducts = ({ route }) => {
   const fetchData = async () => {
     try {
       // Map selected drives to an array of fetch promises
-      const fetchDataPromises = selectedDrives.map(async ({ supermarket,nom_drive, nom_driveUrl, dateScraped }) => {
+      const fetchDataPromises = selectedDrives.map(async ({ supermarket,department,nom_drive, nom_driveUrl, dateScraped }) => {
         // Check if data is stored locally
         const localData = await getLocalData(nom_drive);
         if (localData) {
@@ -130,7 +138,7 @@ const SearchProducts = ({ route }) => {
 
   
         // Fetch data from the network
-        const url = `https://bubu0797.pythonanywhere.com/apininja/products/${supermarket}/${nom_driveUrl}`;
+        const url = `https://compar.freeboxos.fr/apininja/product/${department}/${supermarket}/${nom_driveUrl}`;
         const response = await axios.get(url);
         const responseData = response.data;
   

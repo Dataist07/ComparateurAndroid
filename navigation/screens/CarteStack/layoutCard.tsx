@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     button:{
-        backgroundColor:'#FCC908',
+        backgroundColor:'#FFDB14',
         borderRadius:7,
         marginHorizontal:10,
         marginVertical:20,
@@ -92,7 +92,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         height: 100,
-        width:150
+        width:150,
+        borderWidth: 1,
+        borderColor: "#1E262F",
       },
     infoText: {
         fontSize: 16,
@@ -103,5 +105,4 @@ const styles = StyleSheet.create({
     },
   
 });
-
 export default ListCard;

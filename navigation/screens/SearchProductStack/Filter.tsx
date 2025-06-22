@@ -137,17 +137,17 @@ const Filter = ({ route }) => {
                 </TouchableOpacity>
             )}
 
-            {//interstitialLoaded ?
+            {interstitialLoaded ?
                 <TouchableOpacity
                     onPress={() => {
-                        //interstitial.show();
+                        interstitial.show();
                         handleConfirmSelection();}
                     }
                     style={styles.buttonEntrer}
                 >
                     <Text style={styles.infoText}>Voir les produits</Text>
                 </TouchableOpacity>
-              //: <ActivityIndicator/>
+              : <ActivityIndicator/>
             }    
             <BannerAd 
                 unitId={adUnitId}
@@ -171,6 +171,7 @@ const styles = StyleSheet.create({
         marginVertical: 10,
         marginBottom: 20,
         textAlign: 'center',
+        
     },
     row: {
         flexDirection: 'row',
@@ -188,7 +189,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
     },
     buttonEntrer: {
-        backgroundColor: '#FCC908',
+        backgroundColor: '#FFDB14',
         borderRadius: 7,
         marginHorizontal: 10,
         paddingHorizontal: 5,
@@ -197,6 +198,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         height: 45,
+        borderColor: "#1E262F",
+        borderWidth: 1,
     },
     infoText: {
         fontWeight: '700',

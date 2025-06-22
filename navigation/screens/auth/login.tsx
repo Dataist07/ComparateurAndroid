@@ -2,7 +2,7 @@ import { View, Text, Button,ActivityIndicator, StyleSheet,TextInput,TouchableOpa
 import { useNavigation } from '@react-navigation/native';
 
 import {FirebaseAuth} from '../../../component/firebaseConfig';
-import {signInWithEmailAndPassword,createUserWithEmailAndPassword} from 'firebase/auth';
+import {signInWithEmailAndPassword,createUserWithEmailAndPassword, sendPasswordResetEmail} from 'firebase/auth';
 
 import React, { useEffect, useState } from "react";
 
@@ -15,7 +15,9 @@ const Login = () =>{
 
     const [email, setEmail] = useState('') ;
     const [password, setPassword] = useState('');
+    const [confirmationPassword, setConfirmationPassword] = useState('');
     const [loading, setLoading] = useState(false);
+    const [createAccount, setCreateAccount] = useState(false);
     const auth = FirebaseAuth;
 
     const signIn = async () => {
@@ -25,7 +27,7 @@ const Login = () =>{
             console.log(response);
         } catch (error) {
             console.log(error);
-            alert('Sign in failed: ' + error.message);
+            alert('Erreur connexion: ' + error.message);
         } finally { 
             setLoading (false);
         }
@@ -36,13 +38,26 @@ const Login = () =>{
         try {
             const response = await createUserWithEmailAndPassword(auth, email, password);
             console.log(response);
-            alert('Check your emails!');
+            //alert('Check your emails!');
         } catch (error) {
             console.log(error);
-            alert('Sign in failed: ' + error.message);
+            alert('Erreur incription: ' + error.message);
         } finally { 
             setLoading (false);
         }
+    };
+
+    const handleForgotPassword = async () => {
+      if (!email) {
+        alert("Veuillez entrer votre email pour réinitialiser le mot de passe.");
+        return;
+      }
+      try {
+        await sendPasswordResetEmail(auth, email);
+        alert("Un email de réinitialisation a été envoyé. Vérifiez votre dossier spam.");
+      } catch (error) {
+        alert("Erreur lors de la réinitialisation : " + error.message);
+      }
     };
       
 return (
@@ -55,7 +70,7 @@ return (
         style={styles.input}
         placeholder="Email"
         autoCapitalize="none"
-        onChangeText={(text) => setEmail(text)}
+        onChangeText={(text) => setEmail(text.trim())}
         placeholderTextColor="#aaa" // Faded placeholder text
       />
       <TextInput
@@ -64,9 +79,31 @@ return (
         style={styles.input}
         placeholder="Mot de passe"
         autoCapitalize="none"
-        onChangeText={(text) => setPassword(text)}
+        onChangeText={(text) => setPassword(text.trim())}
         placeholderTextColor="#aaa" // Faded placeholder text
       />
+      {createAccount? (
+        <View>
+          <TextInput
+            value={confirmationPassword}
+            secureTextEntry={true}
+            style={styles.input}
+            placeholder="Confirmer votre mot de passe"
+            autoCapitalize="none"
+            onChangeText={(text) => setConfirmationPassword(text.trim())}
+            placeholderTextColor="#aaa" // Faded placeholder text
+          />
+        
+        </View>
+      ) :  (
+        <View>
+          <TouchableOpacity onPress={handleForgotPassword}>
+            <Text style={{ color: '#007AFF', textAlign: 'right', marginBottom: 10 }}>
+              Mot de passe oublié ?
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
 
       {loading ? (
         <ActivityIndicator size="large" color="#0000ff" style={styles.activityIndicator} />
@@ -74,12 +111,30 @@ return (
         <View style={styles.buttonContainer}>
 
           <TouchableOpacity 
-            onPress={signIn} style={styles.buttonConnection} >
+            onPress={() => {
+              if (!createAccount) {
+                signIn();             
+              } else {
+                setCreateAccount(false);
+              }
+            }} 
+            style={styles.buttonConnection} >
             <Text style={styles.infoText} >Se connecter</Text>
           </TouchableOpacity>
 
           <TouchableOpacity 
-            onPress={signUp} style={styles.buttonConnection} >
+            onPress={() => {
+              if (!createAccount) {
+                setCreateAccount(true);
+              } else {
+                if (password !== confirmationPassword) {
+                  alert("Mot de passe ne se correspond pas !");
+                  return;
+                }
+                signUp();
+              }
+            }} 
+            style={styles.buttonConnection} >
             <Text style={styles.infoText} >Créer un compte</Text>
           </TouchableOpacity>
         
@@ -123,10 +178,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 20,
+    //marginBottom: 20,
     },
     buttonConnection:{
    
-      backgroundColor:'#FCC908',
+      backgroundColor:'#FFDB14',
       borderRadius:7,
       marginHorizontal:10,
       paddingHorizontal:10,
@@ -134,12 +190,13 @@ const styles = StyleSheet.create({
       alignItems: 'center',
       justifyContent: 'center',
       height: 52,
-     
+      borderColor: "#1E262F",
+      borderWidth: 1,
     },
 
     buttonFiltre:{
       marginTop: 30,
-      backgroundColor:'#FCC908',
+      backgroundColor:'#FFDB14',
       borderRadius:7,
       marginHorizontal:10,
       paddingHorizontal:5,
@@ -147,6 +204,8 @@ const styles = StyleSheet.create({
       alignItems: 'center',
       justifyContent: 'center',
       height: 45,
+      borderColor: "#1E262F",
+      borderWidth: 1,
      
     },
     infoText: {
@@ -157,7 +216,7 @@ const styles = StyleSheet.create({
       
     },
     textInformation: {
-      marginTop:100,
+      marginTop:50,
       fontSize: 16,
       textAlign: 'center',
       color: "#1E262F",

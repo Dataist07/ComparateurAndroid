@@ -81,7 +81,7 @@ const AddCards = () => {
           
            
         } catch (error) {
-            console.error('Error saving card:', error);
+            console.error('Erreur de sauvegarde de la carte:', error);
         }
     };
 
@@ -100,15 +100,15 @@ const AddCards = () => {
 
     const handleBarCodeScanned = ({ type, data }) => {
         setScanned(true);
-        alert(`Bar code with type ${type} and data ${data} has been scanned!`);
+        alert(`Les données du code barre ont été scanné: ${data}! Veuillez donner un nom à la carte et appuyer sur Enregistrer la carte.`);
         setNumCard(data);
     };
 
     if (hasPermission === null) {
-        return <Text>Requesting for camera permission</Text>;
+        return <Text style={styles.infoText}>Demande d'accès à la caméra</Text>;
     }
     if (hasPermission === false) {
-        return <Text>No access to camera</Text>;
+        return <Text style={styles.infoText}>Pas d'accès à la caméra</Text>;
     }
 
 
@@ -119,7 +119,7 @@ const AddCards = () => {
                     onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
                     style={StyleSheet.absoluteFillObject}
                 />
-                {scanned && <Button title={'Tap to Scan Again'} onPress={() => setScanned(false)} />}
+                {scanned && <Button title={"Tapper sur l'écran pour rescanner"} onPress={() => setScanned(false)} />}
             </View>
             <TextInput
                 value={nameCard}
@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         },
     button: {
-        backgroundColor: '#FCC908',
+        backgroundColor: '#FFDB14',
         borderRadius: 7,
         marginHorizontal: 10,
         paddingHorizontal: 5,
@@ -187,10 +187,13 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         height: 45,
         marginVertical: 5,
+        borderColor: "#1E262F",
+        borderWidth: 1,
     },
     infoText: {
         fontSize: 16,
         textAlign: 'center',
+        alignItems: 'center',
         color: "#1E262F",
         fontWeight: '700',
     },
