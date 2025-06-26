@@ -1,4 +1,4 @@
-import { View, Text, Button,ActivityIndicator, StyleSheet,TextInput,TouchableOpacity,ScrollView} from 'react-native';
+import { View, Text, Button,ActivityIndicator, StyleSheet,TextInput,TouchableOpacity,ScrollView,FlatList} from 'react-native';
 import { useNavigation,useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, {useState,useCallback } from "react";
@@ -38,38 +38,48 @@ const ListCard = ({ route }) =>{
         navigation.navigate("Ajouter une carte");
     };
 return (
-    <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.container}>
-            {listCards.map((card, index) => (
+    <View style={{flex: 1, backgroundColor: "#fff"}}>
+        <FlatList
+            data={listCards}
+            keyExtractor={(item, index) => index.toString()}
+            numColumns={2}
+            contentContainerStyle={styles.flatListContainer}
+            renderItem={({ item }) => (
                 <TouchableOpacity
-                    key={index}
-                    onPress={() => handleCardPress(card.nameCard)}
+                    onPress={() => handleCardPress(item.nameCard)}
                     style={styles.button}
                 >
-                    <Text style={styles.infoText}>{card.nameCard}</Text>
+                    <Text style={styles.infoText}>{item.nameCard}</Text>
                 </TouchableOpacity>
-            ))}
+            )}
 
-            <TouchableOpacity
-                onPress={handleAjouterCarte}
-                style={styles.button}
-            >
-                <Text style={styles.infoText}>Ajouter une carte</Text>
-            </TouchableOpacity>
-        
-        </View>
+            ListFooterComponent={
+                <TouchableOpacity
+                    onPress={handleAjouterCarte}
+                    style={styles.button}
+                >
+                    <Text style={styles.infoText}>Ajouter une carte</Text>
+                </TouchableOpacity>
+            }
+        />
         <BannerAd 
             unitId={adUnitId}
             size={BannerAdSize.FULL_BANNER}
             requestOptions={{
-            requestNonPersonalizedAdsOnly: true
+                requestNonPersonalizedAdsOnly: true
             }}
         />
-    </ScrollView>
+    </View>
     );
 };
 
 const styles = StyleSheet.create({
+    flatListContainer: {
+        alignItems: 'center',        // Center items horizontally
+        //justifyContent: 'space-arround',    // Center items vertically (optional)
+        flexGrow: 1,                 // Let content fill available space
+        paddingVertical: 10,
+    },
     container: {
         flex: 1,
         justifyContent: 'space-arround',
@@ -88,10 +98,11 @@ const styles = StyleSheet.create({
         borderRadius:7,
         marginHorizontal:10,
         marginVertical:20,
-        paddingVertical:5,
+        
+        paddingVertical:30,
         alignItems: 'center',
         justifyContent: 'center',
-        height: 100,
+        //height: 100,
         width:150,
         borderWidth: 1,
         borderColor: "#1E262F",

@@ -34,12 +34,12 @@ export default function App() {
           style={{flex: 1}}
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         >
-          <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+          
             <SafeAreaView style={{flex: 1}}>
               <MainContainer />
               <StatusBar style="auto" />
             </SafeAreaView>
-          </TouchableWithoutFeedback>
+        
         </KeyboardAvoidingView>
       </PersistGate>
     </Provider>   

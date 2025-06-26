@@ -1,4 +1,14 @@
-import { View, Text, Button,ActivityIndicator, StyleSheet,TextInput,TouchableOpacity} from 'react-native';
+import { 
+  View, 
+  Text, 
+  Button,
+  ActivityIndicator, 
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  Keyboard
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 import {FirebaseAuth} from '../../../component/firebaseConfig';
@@ -61,6 +71,7 @@ const Login = () =>{
     };
       
 return (
+  <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
     <View style={styles.container}>
       <Text style={styles.title}>Bienvenue !</Text>
 
@@ -148,6 +159,7 @@ return (
         <Text style={styles.infoText} >Essayer l'application (sans compte)</Text>
       </TouchableOpacity>
     </View>
+  </TouchableWithoutFeedback>
   );
 };
 

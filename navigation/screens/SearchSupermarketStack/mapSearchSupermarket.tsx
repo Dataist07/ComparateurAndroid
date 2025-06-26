@@ -52,13 +52,15 @@ const SearchSupermarketMap = ({ filteredData }) => {
       case "Leclerc":
         return require('./Static/LeclercIcon.png'); // Use the correct path to your Leclerc icon
       case "HyperIntermarche":
-        return require('./Static/HyperIntermarcheIcon.png'); 
+        return require('./Static/IntermarcheIcon.png'); 
       case "SuperIntermarche":
-        return require('./Static/SuperIntermarcheIcon.png'); 
+        return require('./Static/IntermarcheIcon.png'); 
       case "HyperU":
         return require('./Static/HyperUIcon.png');
       case "SuperU":
         return require('./Static/SuperUIcon.png');
+      case "Lidl":
+        return require('./Static/LidlIcon.png');
       default:
         return require('./Static/defaultIcon.jpg'); // Use a default icon or provide a default path
     }

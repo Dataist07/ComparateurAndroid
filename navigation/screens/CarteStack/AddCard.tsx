@@ -1,4 +1,15 @@
-import { View, Text, StyleSheet, TouchableOpacity,  TextInput,Button,Alert,ActivityIndicator } from 'react-native';
+import { 
+    View, 
+    Text, 
+    StyleSheet, 
+    TouchableOpacity,  
+    TextInput,
+    Button,
+    Alert,
+    ActivityIndicator,
+    TouchableWithoutFeedback,
+    Keyboard
+} from 'react-native';
 import React, { useEffect, useState, useRef } from "react";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from "@react-navigation/native";
@@ -113,48 +124,48 @@ const AddCards = () => {
 
 
     return (
-        <View style={styles.container}>
-            <View style={styles.containerCamera}>
-                <BarCodeScanner
-                    onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-                    style={StyleSheet.absoluteFillObject}
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+            <View style={styles.container}>
+                <View style={styles.containerCamera}>
+                    <BarCodeScanner
+                        onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+                        style={StyleSheet.absoluteFillObject}
+                    />
+                    {scanned && <Button title={"Tapper sur l'écran pour rescanner"} onPress={() => setScanned(false)} />}
+                </View>
+                <TextInput
+                    value={nameCard}
+                    style={styles.input}
+                    placeholder="Nom de la carte" // French placeholder text
+                    onChangeText={setNameCard}
+                    placeholderTextColor="#aaa" // Faded placeholder text
                 />
-                {scanned && <Button title={"Tapper sur l'écran pour rescanner"} onPress={() => setScanned(false)} />}
-            </View>
-            <TextInput
-                value={nameCard}
-                style={styles.input}
-                placeholder="Nom de la carte" // French placeholder text
-                onChangeText={setNameCard}
-                multiline={true} // Allow multiple lines for body content
-                placeholderTextColor="#aaa" // Faded placeholder text
-            />
-           
-            <TextInput
-                value={numCard}
-                style={styles.input}
-                placeholder="Numero de la carte" // French placeholder text
-                onChangeText={setNumCard} // Allow only numbers
-                multiline={true} // Allow multiple lines for body content
-                placeholderTextColor="#aaa" // Faded placeholder text
-            />
+            
+                <TextInput
+                    value={numCard}
+                    style={styles.input}
+                    placeholder="Numero de la carte" // French placeholder text
+                    onChangeText={setNumCard} // Allow only numbers
+                    placeholderTextColor="#aaa" // Faded placeholder text
+                />
 
-            {//interstitialLoaded ? 
-                <TouchableOpacity
-                    onPress={() =>{ 
-                        
-                        handleAddCard(); 
-                        //interstitial.show();
-                    }} 
-                   
-                    style={styles.button}
-                >
-                    <Text style={styles.infoText}>Enregistrer la carte</Text>
-                </TouchableOpacity>
-              //: <ActivityIndicator/>
-            }  
-        
-        </View>
+                {//interstitialLoaded ? 
+                    <TouchableOpacity
+                        onPress={() =>{ 
+                            
+                            handleAddCard(); 
+                            //interstitial.show();
+                        }} 
+                    
+                        style={styles.button}
+                    >
+                        <Text style={styles.infoText}>Enregistrer la carte</Text>
+                    </TouchableOpacity>
+                //: <ActivityIndicator/>
+                }  
+            
+            </View>
+        </TouchableWithoutFeedback>
     );
 };
 

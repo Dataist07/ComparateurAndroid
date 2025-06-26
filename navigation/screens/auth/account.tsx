@@ -1,4 +1,15 @@
-import { View, Text, Button,ActivityIndicator, StyleSheet,TextInput,TouchableOpacity,Alert} from 'react-native';
+import { 
+    View, 
+    Text, 
+    Button,
+    ActivityIndicator, 
+    StyleSheet,
+    TextInput,
+    TouchableOpacity,
+    Alert,
+    TouchableWithoutFeedback,
+    Keyboard
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -9,6 +20,7 @@ import React, { useEffect, useState } from "react";
 import { BannerAd, BannerAdSize, TestIds, InterstitialAd, AdEventType, RewardedInterstitialAd, RewardedAdEventType } from 'react-native-google-mobile-ads';
 
 const adUnitId = __DEV__ ? TestIds.BANNER : 'ca-app-pub-1082484914143239/2328590649';
+
 const Account = () =>{
    
     //const [subject, setSubject] = useState('');
@@ -60,44 +72,46 @@ const Account = () =>{
 
     };
 return (
-    <View style={styles.container}>
-        <Text style={styles.title}>Écrivez-nous</Text>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+        <View style={styles.container}>
+            <Text style={styles.title}>Écrivez-nous</Text>
 
-        <TextInput
-        value={body}
-        style={styles.input}
-        placeholder="Message" // French placeholder text
-        onChangeText={setBody}
-        multiline={true} // Allow multiple lines for body content
-        placeholderTextColor="#aaa" // Faded placeholder text
+            <TextInput
+            value={body}
+            style={styles.input}
+            placeholder="Message" // French placeholder text
+            onChangeText={setBody}
+            multiline={true} // Allow multiple lines for body content
+            placeholderTextColor="#aaa" // Faded placeholder text
+            />
+
+            <TouchableOpacity 
+                onPress={handleSendEmail} style={styles.button} >
+                <Text style={styles.infoText} >Envoyer le message</Text>
+            </TouchableOpacity>
+
+
+            {/* Disconnect button with improved styling */}
+            <View style={styles.buttonContainer}>
+                <TouchableOpacity 
+                    onPress={() => FirebaseAuth.signOut()} style={styles.button} >
+                    <Text style={styles.infoText} >Déconnexion</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity 
+                    onPress={handleDeletUser} style={styles.buttonDelete} >
+                    <Text style={styles.infoText} >Supprimer le compte</Text>
+                </TouchableOpacity>
+            </View>
+            <BannerAd 
+            unitId={adUnitId}
+            size={BannerAdSize.FULL_BANNER}
+            requestOptions={{
+            requestNonPersonalizedAdsOnly: true
+            }}
         />
-
-        <TouchableOpacity 
-            onPress={handleSendEmail} style={styles.button} >
-            <Text style={styles.infoText} >Envoyer le message</Text>
-        </TouchableOpacity>
-
-
-        {/* Disconnect button with improved styling */}
-        <View style={styles.buttonContainer}>
-            <TouchableOpacity 
-                onPress={() => FirebaseAuth.signOut()} style={styles.button} >
-                <Text style={styles.infoText} >Déconnexion</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity 
-                onPress={handleDeletUser} style={styles.buttonDelete} >
-                <Text style={styles.infoText} >Supprimer le compte</Text>
-            </TouchableOpacity>
         </View>
-        <BannerAd 
-        unitId={adUnitId}
-        size={BannerAdSize.FULL_BANNER}
-        requestOptions={{
-          requestNonPersonalizedAdsOnly: true
-        }}
-      />
-    </View>
+    </TouchableWithoutFeedback>
     );
 };
 
